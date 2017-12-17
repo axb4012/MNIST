@@ -24,7 +24,7 @@ class CNN:
         return f, b
 
     def max_pool(self, conv, name, k = 2, s = 2):
-        return tf.nn.max_pool(conv, [1, k ,k , 1], [1, s, s, 1], padding='SAME', name=name)
+        return tf.nn.max_pool(conv, [1, k ,k , 1], [1, s, s, 1], padding='VALID', name=name)
 
     def fc_layer(self, bottom, in_c, out_c, name):
         with tf.variable_scope(name):
@@ -54,20 +54,32 @@ class CNN:
         #images = tf.reduce_mean(images,axis=3,name='Exapnd_Axis')
         #images = tf.expand_dims(images, axis=3)
         #self.i1 = images[1]
-        conv = self.conv_layer('conv1', images, 3, 3, 32, 1)
+        conv = self.conv_layer('conv1', images, 3, 3, 64, 1)
+        activ = self.activation(conv)
+        conv = self.conv_layer('conv1_2', activ, 3, 64, 64, 1)
         activ = self.activation(conv)
         pool =  self.max_pool(activ, 'pool1')
         net = tf.nn.batch_normalization(x=pool,mean=0,variance=1,variance_epsilon=0.001,name='batch_norm1',offset=None,scale=None)
         #net = self.lrn_layer(pool, 'lrn1')
 
-        conv = self.conv_layer('conv2', net, 3, 32, 64, 1)
+        conv = self.conv_layer('conv2', net, 3, 64, 128, 1)
+        activ = self.activation(conv)
+        conv = self.conv_layer('conv2_2', activ, 3, 128, 128, 1)
         activ = self.activation(conv)
         pool =  self.max_pool(activ, 'pool2')
         net = tf.nn.batch_normalization(x=pool,mean=0,variance=1,variance_epsilon=0.001,name='batch_norm2',offset=None,scale=None)
 
 
-        conv = self.conv_layer('conv3', net, 3, 64, 128, 1)
+        conv = self.conv_layer('conv3', net, 3, 128, 256, 1)
         activ = self.activation(conv)
+        conv = self.conv_layer('conv3_2', activ, 3, 256, 256, 1)
+        activ = self.activation(conv)
+
+        conv = self.conv_layer('conv3_3', activ, 3, 256, 256, 1)
+        activ = self.activation(conv)
+        conv = self.conv_layer('conv3_4', activ, 3, 256, 256, 1)
+        activ = self.activation(conv)
+
         pool =  self.max_pool(activ, 'pool3')
         #self.i1 = pool
         net = tf.nn.batch_normalization(x=pool,mean=0,variance=1,variance_epsilon=0.001,name='batch_norm3',offset=None,scale=None)
@@ -75,23 +87,40 @@ class CNN:
         #net = tf.nn.batch_normalization()
         #net = self.lrn_layer(pool, 'lrn2')
 
-        conv = self.conv_layer('conv4', net, 3, 128, 256, 1)
+        conv = self.conv_layer('conv4', net, 3, 256, 512, 1)
         activ = self.activation(conv)
+        conv = self.conv_layer('conv4_2', activ, 3, 512, 512, 1)
+        activ = self.activation(conv)
+
+        conv = self.conv_layer('conv4_3', activ, 3, 512, 512, 1)
+        activ = self.activation(conv)
+        conv = self.conv_layer('conv4_4', activ, 3, 512, 512, 1)
+        activ = self.activation(conv)
+
         pool =  self.max_pool(activ, 'pool4')
         #self.i1 = pool
         net = tf.nn.batch_normalization(x=pool,mean=0,variance=1,variance_epsilon=0.001,name='batch_norm4',offset=None,scale=None)
 
-        conv = self.conv_layer('conv5', net, 3, 256, 512, 1)
+
+        conv = self.conv_layer('conv5', net, 3, 512, 512, 1)
         activ = self.activation(conv)
+        conv = self.conv_layer('conv5_2', activ, 3, 512, 512, 1)
+        activ = self.activation(conv)
+
+        conv = self.conv_layer('conv5_3', activ, 3, 512, 512, 1)
+        activ = self.activation(conv)
+        conv = self.conv_layer('conv5_4', activ, 3, 512, 512, 1)
+        activ = self.activation(conv)
+
         pool =  self.max_pool(activ, 'pool5')
         #self.i1 = pool
         net = tf.nn.batch_normalization(x=pool,mean=0,variance=1,variance_epsilon=0.001,name='batch_norm5',offset=None,scale=None)
 
-        conv = self.conv_layer('conv6', net, 3, 512, 1024, 1)
-        activ = self.activation(conv)
-        pool =  self.max_pool(activ, 'pool6')
+        #conv = self.conv_layer('conv6', net, 3, 512, 1024, 1)
+        #activ = self.activation(conv)
+        #pool =  self.max_pool(activ, 'pool6')
         #self.i1 = pool
-        net = tf.nn.batch_normalization(x=pool,mean=0,variance=1,variance_epsilon=0.001,name='batch_norm6',offset=None,scale=None)
+        #net = tf.nn.batch_normalization(x=pool,mean=0,variance=1,variance_epsilon=0.001,name='batch_norm6',offset=None,scale=None)
 
         dim = np.prod(net.shape[1:]).value
         #self.i1 = tf.reshape(net, [-1, dim])
